@@ -2,11 +2,7 @@ package main
 //Посроение интерполяционного многочлена Ньютона
 import (
 	"fmt"
-	"github.com/shopspring/decimal"
 )
-
-
-//Доделать Decimal
 
 //Функция f(a) - коэффициентов полинома
 //Составляется из разделённых разностей полинома (см теорию http://matlab.exponenta.ru/spline/book1/14.php)
@@ -15,15 +11,12 @@ import (
 //И т.д.
 //На вход i - номер коэффициента; div_depth - шаг деления
 //x - иксы, fx - игреки
-func fa(i int, div_depth int, x []int, fx []int) int {
-	var result int
-	var div int
-	var N_D decimal.New(0,0)
-	//N_D := decimal.New(0,0)
-	N_D2 := decimal.New(0,0)
+func fa(i int, div_depth int, x []int, fx []int) float64 {
+	var result float64
+	var div float64
 	if i == 1 {
-		result = ( fx[i+div_depth] - fx[i+div_depth-1] )
-		div = (x[i+div_depth] - x[i+div_depth-1])
+		result = float64( fx[i+div_depth] - fx[i+div_depth-1] )
+		div = float64(x[i+div_depth] - x[i+div_depth-1])
 		if div != 0 {
 			result /= div
 		} else {
@@ -31,22 +24,15 @@ func fa(i int, div_depth int, x []int, fx []int) int {
 		}
 	} else {
 		result = (fa(i-1,div_depth+1,x,fx) - fa(i-1,div_depth,x,fx) )
-		div= (x[i+div_depth] - x[0 + div_depth])
+		div= float64(x[i+div_depth] - x[0 + div_depth])
 		if div != 0 {
-			N_D = decimal.New(int64(result),0)
-			N_D2 = decimal.New(int64(div),0)
-			N_D = N_D.Div(N_D2)
-			fmt.Println(N_D.StringFixed(2))
 			result /= div
+			result = toFixed(result,2)
 		} else {
 			result = 0
 		}
-		
-
-		
 	}
 	return result
-	
 }
 
 func main() {
@@ -72,6 +58,13 @@ func main() {
 		Polynom_sum += buf
 	}*/
 
-	fmt.Println("fa(21) = ",fa(3,0,x,fx))
+	fmt.Println("fa(10) = ",fa(1,0,x,fx))
+	fmt.Println("fa(11) = ",fa(1,1,x,fx))
+	fmt.Println("fa(12) = ",fa(1,2,x,fx))
+	fmt.Println("fa(20) = ",fa(2,0,x,fx))
+	fmt.Println("fa(21) = ",fa(2,1,x,fx))
+	fmt.Println("fa(30) = ",fa(3,0,x,fx))
 
+	var scan string
+	fmt.Scan(&scan)
 }
