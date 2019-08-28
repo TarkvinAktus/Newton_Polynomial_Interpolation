@@ -4,7 +4,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"strconv"
 )
 
 //Функция f(a) - коэффициентов полинома
@@ -38,59 +37,108 @@ func fa(i int, divDepth int, x []int, fx []int) float64 {
 	return result
 }
 
-// A[] represents coefficients of first polynomial 
-// B[] represents coefficients of second polynomial 
-// m and n are sizes of A[] and B[] respectively 
-func multiply(A []int, B []int, m int, n int) []int { 
-   prod := [m+n-1]int 
-   // Initialize the porduct polynomial 
-   for i := 0; i<m+n-1; i++ {
-	   prod[i] = 0 
-   }
-   // Multiply two polynomials term by term 
-  
-   // Take ever term of first polynomial 
-   for i:=0; i<m; i++ { 
-     // Multiply the current term of first polynomial 
-     // with every term of second polynomial. 
-     for (int j=0; j<n; j++){
-		prod[i+j] += A[i]*B[j]
-	 }  
-   } 
-  
-   return prod
-} 
+// НЕ ПРОТЕСТИРОВАНО
+// A[] represents coefficients of first polynomial
+// B[] represents coefficients of second polynomial
+// m and n are sizes of A[] and B[] respectively
+func multiply(Result *[]int, A []int, B []int, m int, n int) {
+	prod := make([]int, m+n-1)
+	// Initialize the porduct polynomial
+	for i := 0; i < m+n-1; i++ {
+		prod[i] = 0
+	}
+	// Multiply two polynomials term by term
 
+	// Take ever term of first polynomial
+	for i := 0; i < m; i++ {
+		// Multiply the current term of first polynomial
+		// with every term of second polynomial.
+		for j := 0; j < n; j++ {
+			prod[i+j] += A[i] * B[j]
+		}
+	}
+	for i := 0; i < m+n-1; i++ {
+		(*Result)[i] += prod[i]
+	}
+}
+
+//polynom возвращает координату точки с известным х (Xpoint)
+//на основе слайсов с координатами остальных точек
+//ПРОТЕСТИРОВАНО
 func polynom(x []int, y []int, Xpoint int) float64 {
 	var PolynomSum float64
 	var buf float64
-	var resultStr string
-
-	resultStr += string(strconv.Itoa(y[0]))
+	//var resultStr string
 
 	PolynomSum += float64(y[0])
-
+	//resultStr += string(strconv.Itoa(y[0]))
 	for i := 1; i < (len(x)); i++ {
-		resultStr += "+"
-		
 		buf = fa(i, 0, x, y)
-		s := fmt.Sprintf("%f", buf)
-		resultStr += s
-		
-		
+		//resultStr += "+"
+		//s := fmt.Sprintf("%f", buf)
+		//resultStr += s
 		for j := 0; j < i; j++ {
 			buf *= float64(Xpoint - x[j])
-			resultStr += "(x-"
-			resultStr += strconv.Itoa(x[j])
-			resultStr += ")"
-
+			//resultStr += "(x-"
+			//resultStr += strconv.Itoa(x[j])
+			//resultStr += ")"
 		}
 		PolynomSum += buf
 	}
-	fmt.Println("result = ",resultStr)
+	//fmt.Println("result = ",resultStr)
 	return math.Round(PolynomSum)
 }
 
+//В РАБОТЕ
+//Комментарии
+//ADD RETURN
+//polynomialCoefficents Будет возвращать коэффициенты вычисленного полинома
+//на основе слайсов с координатами известных точек
+func polynomialCoefficents(x []int, y []int) {
+	PolCoefficents := make([]float64, len(x))
+	var AnCoefficient float64
+
+	PolCoefficents[0] = float64(y[0])
+
+	for i := 1; i < (len(x)); i++ {
+
+		AnCoefficient = fa(i, 0, x, y)
+
+		PolBuf := make([]float64, len(x)*2-1)
+
+		//Pol member = Fn(x-n1)(x-n2)...(x-n-1)
+		for j := 0; j < i-1; j++ {
+			MulBuf := make([]int, len(x)*2-1)
+			//Проверить корректность умножения 0 как члена полинома
+
+			SecondMul := make([]int, 2)
+			SecondMul[0] = -x[j+1]
+			SecondMul[1] = 1
+			if j == 0 {
+				FirstMul := make([]int, 2)
+				FirstMul[0] = -x[j]
+				FirstMul[1] = 1
+				multiply(&MulBuf, FirstMul, SecondMul, len(FirstMul), len(SecondMul))
+			} else {
+				multiply(&MulBuf, MulBuf, SecondMul, len(MulBuf), len(SecondMul))
+			}
+
+			for i := 0; i < len(MulBuf); i++ {
+				PolBuf[i] += float64(MulBuf[i])
+				//if coefficient ==0 => stop?
+			}
+		}
+		for i := 0; i < len(PolBuf); i++ {
+			//if coefficient ==0 => stop?
+			PolCoefficents[i] += PolBuf[i] * AnCoefficient
+		}
+	}
+}
+
+//Вычисление тестового примера для
+//x := []int{0, 1, 2, 3}
+//fx := []int{-2, -5, 0, -4}
+//Источник - http://kontromat.ru/?page_id=4955
 func check(x int) float64 {
 	var buf float64
 	buf = (float64(-17)/float64(6))*(math.Pow(float64(x), 3)) + (math.Pow(float64(x), 2) * 12.5) - (float64(38) / float64(3) * float64(x)) - 2
@@ -98,7 +146,7 @@ func check(x int) float64 {
 
 }
 
-func main() {
+func test() {
 
 	x := []int{0, 1, 2, 3}
 	fx := []int{-2, -5, 0, -4}
