@@ -56,7 +56,7 @@ func startServer() {
 	fmt.Println("starting server at :9000")
 	http.ListenAndServe(":9000", nil)
 }
-
+/*
 func runGetFullReq() {
 
 	req := &http.Request{
@@ -79,7 +79,7 @@ func runGetFullReq() {
 	respBody, err := ioutil.ReadAll(resp.Body)
 
 	fmt.Printf("testGetFullReq resp %#v\n\n\n", string(respBody))
-}
+}*/
 
 func main() {
 	startServer()
