@@ -2,6 +2,7 @@ package main
 
 //Посроение интерполяционного многочлена Ньютона
 import (
+	"fmt"
 	"math"
 )
 
@@ -17,7 +18,7 @@ func Fa(i int, divDepth int, x []int, fx []int) float64 {
 	var div float64
 	if i == 1 {
 		result = float64(fx[i+divDepth] - fx[i+divDepth-1])
-		div = float64(x[i+divDepth] - x[i+divDepth-1])
+		div = float64(x[i+divDepth] - x[divDepth])
 		if div != 0 {
 			result /= div
 		} else {
@@ -25,7 +26,7 @@ func Fa(i int, divDepth int, x []int, fx []int) float64 {
 		}
 	} else {
 		result = (Fa(i-1, divDepth+1, x, fx) - Fa(i-1, divDepth, x, fx))
-		div = float64(x[i+divDepth] - x[0+divDepth])
+		div = float64(x[i+divDepth] - x[divDepth])
 		if div != 0 {
 			result /= div
 			result = toFixed(result, 2)
@@ -41,12 +42,16 @@ func Fa(i int, divDepth int, x []int, fx []int) float64 {
 // Результат умножения в степень равную сумме степеней членов многочлена
 // Внутри слайсов они отсортированы по степеням*
 func Multiply(Result *[]int, A []int, B []int, m int, n int) {
+	bufLen := make([]int, len(*Result))
 	for i := 0; i < m; i++ {
-		for j := 0; j < n; j++ {
-			(*Result)[i+j] += A[i] * B[j]
-			//fmt.Print("+", A[i]*B[j], "x^", i+j)
+		if A[i] != 0 {
+			for j := 0; j < n; j++ {
+				bufLen[i+j] += (A[i] * B[j])
+			}
 		}
-		//fmt.Println("")
+	}
+	for i := 0; i < len(*Result); i++ {
+		(*Result)[i] = bufLen[i]
 	}
 }
 
@@ -77,48 +82,61 @@ func Polynom(x []int, y []int, Xpoint int) float64 {
 	return math.Round(PolynomSum)
 }
 
-//PolynomialCoefficents В РАБОТЕ
-//Комментарии
-//ADD RETURN
+//PolynomialCoefficents ПЕРЕСМОТРЕТЬ РАБОТУ С FLOAT
 //Будет возвращать коэффициенты вычисленного полинома
 //на основе слайсов с координатами известных точек
-func PolynomialCoefficents(x []int, y []int) {
-	PolCoefficents := make([]float64, len(x))
+func PolynomialCoefficents(Result *[]float64, x []int, y []int) {
 	var AnCoefficient float64
 
-	PolCoefficents[0] = float64(y[0])
+	(*Result)[0] = float64(y[0])
 
 	for i := 1; i < (len(x)); i++ {
 
-		AnCoefficient = Fa(i, 0, x, y)
+		polLen := len(x)
+		PolBuf := make([]int, polLen)
 
-		PolBuf := make([]float64, len(x)*2-1)
+		AnCoefficient = Fa(i, 0, x, y)
+		fmt.Println("Fa^", i, " - ", AnCoefficient)
 
 		//Pol member = Fn(x-n1)(x-n2)...(x-n-1)
-		for j := 0; j < i-1; j++ {
-			MulBuf := make([]int, len(x)*2-1)
-			//Проверить корректность умножения 0 как члена полинома
-
+		for j := 0; j < i; j++ {
 			SecondMul := make([]int, 2)
-			SecondMul[0] = -x[j+1]
+			SecondMul[0] = -x[j]
 			SecondMul[1] = 1
 			if j == 0 {
-				FirstMul := make([]int, 2)
-				FirstMul[0] = -x[j]
-				FirstMul[1] = 1
-				Multiply(&MulBuf, FirstMul, SecondMul, len(FirstMul), len(SecondMul))
+				PolBuf[0] += -x[j]
+				PolBuf[1]++
 			} else {
-				Multiply(&MulBuf, MulBuf, SecondMul, len(MulBuf), len(SecondMul))
-			}
-
-			for i := 0; i < len(MulBuf); i++ {
-				PolBuf[i] += float64(MulBuf[i])
-				//if coefficient ==0 => stop?
+				Multiply(&PolBuf, PolBuf, SecondMul, len(PolBuf), len(SecondMul))
 			}
 		}
-		for i := 0; i < len(PolBuf); i++ {
+		fmt.Println("PolBuf - ", PolBuf)
+		for i := 0; i < polLen; i++ {
 			//if coefficient ==0 => stop?
-			PolCoefficents[i] += PolBuf[i] * AnCoefficient
+			(*Result)[i] += toFixed((float64(PolBuf[i]))*AnCoefficient, 2)
 		}
+		//fmt.Println("Result ", i, " = ", (*Result))
 	}
+}
+
+//Lagrange ??
+func Lagrange(x []int, y []int, Xpoint int) int {
+	Sum := 0
+	PartSum := 0
+
+	for i := 0; i < len(x); i++ {
+		PartSum = y[i]
+		for n := 0; n < len(x); n++ {
+			if x[n] != Xpoint {
+				PartSum *= (Xpoint - x[n])
+			}
+		}
+		for m := 0; m < len(x); m++ {
+			if i != m {
+				PartSum /= (x[i] - x[m])
+			}
+		}
+		Sum += PartSum
+	}
+	return Sum
 }

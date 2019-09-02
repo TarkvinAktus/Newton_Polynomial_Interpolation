@@ -7,6 +7,13 @@ canvas.width  = 600;
 let array_x = [];
 let array_y = [];
 
+var posX = 0;
+var posY = 0;
+
+let next_x = 0;
+let prev_x = 0;
+let line = 0;
+
 ctx.fillStyle = "black"
 ctx.fillRect(0, 0, 600, 400);
 
@@ -30,13 +37,18 @@ for (var i = 0; i < 400; i+=50) {
 ctx.stroke(); 
 
 
-reload.onclick = erase;
+reload.onclick = erase_all;
 
+
+function erase_all(){
+    array_x = []
+    array_y = []
+    erase()
+}
 
 function erase(){
     j = 0
-    array_x = []
-    array_y = []
+    
     function my_loop(){
         setTimeout(function(){
             ctx.fillStyle = "rgba(0,0,0,"+ 0.05*(j+1)+")"
@@ -74,14 +86,27 @@ function loadData(x,y) {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var my_json = JSON.parse(this.responseText)
-            console.log(my_json)
+            console.log(my_json.pol)
+            /*
+            var my_y = 0;
+            for (var i = 0; i < 600; i++) {
+                my_y = 0;
+                var pol_count = my_json.pol.length
+                for(var j = 0;j<pol_count;j++){
+                    my_y += my_json.pol[j] * Math.pow(i,j)
+                }
+                draw(i,my_y)
+        
+            }*/
+            //erase()
+           for (var i = 0; i < 600; i++){
+                draw(i,my_json.pol[i])
+           }
 
-            for (var i = 0; i < 10; i++) {
-                draw(my_json.x[i],my_json.y[i])
-            }
        }
     };
-    var params = 'x='+ x + '&y=' + y
+
+    var params = 'x='+ array_x + '&y=' + array_y
     xhttp.open("GET", "http://127.0.0.1:9000/?"+params, true);
     xhttp.send(); 
 }
@@ -104,15 +129,14 @@ function draw(x,y){
 
 function handleMouseDown(event) {
     var e = window.event;
-
-    var posX = e.clientX;
-    var posY = e.clientY;
+    posX = e.clientX;
+    posY = e.clientY;
 
     draw(posX,posY);
     array_x.push(posX);
     array_y.push(posY);
-    console.log(array_x);
-    console.log(array_y);
+    //console.log(array_x);
+    //console.log(array_y);
     
     loadData(posX,posY)
 }

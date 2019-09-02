@@ -3,17 +3,20 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 
 	//"io/ioutil"
-	"math"
+
 	"net/http"
 	//"net/url"
 )
 
 //Resp ОТВЕТНЫЕ ТОЧКИ
 type Resp struct {
-	X []int `json:"x"`
-	Y []int `json:"y"`
+	X   []int     `json:"x"`
+	Y   []int     `json:"y"`
+	Pol []float64 `json:"pol"`
 }
 
 func startServer() {
@@ -22,20 +25,35 @@ func startServer() {
 
 		myX := r.URL.Query().Get("x")
 		myY := r.URL.Query().Get("y")
-		fmt.Println("x = ", myX, " y = ", myY)
+
+		Xstring := strings.Split(myX, ",")
+		Ystring := strings.Split(myY, ",")
+
+		reqlen := len(Xstring)
+
+		Xint := make([]int, reqlen)
+		Yint := make([]int, reqlen)
+		for i := 0; i < reqlen; i++ {
+			Xint[i], _ = strconv.Atoi(Xstring[i])
+			Yint[i], _ = strconv.Atoi(Ystring[i])
+		}
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
 		var res Resp
 
-		res.X = make([]int, 10)
-		res.Y = make([]int, 10)
-
-		for i := 0; i < 10; i++ {
-			res.X[i] = int(math.Pow(2, float64(i)))
-			res.Y[i] = i
+		/*
+			if reqlen > 1 {
+				res.Pol = make([]float64, reqlen)
+				PolynomialCoefficents(&res.Pol, Xint, Yint)
+			}
+		*/
+		if reqlen > 1 {
+			res.Pol = make([]float64, 600)
+			for i := 0; i < 600; i++ {
+				res.Pol[i] = float64(Lagrange(Xint, Yint, i))
+			}
 		}
-
 		resJSON, err := json.Marshal(res)
 		if err != nil {
 			fmt.Printf("Error: %s", err)

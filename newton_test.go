@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
@@ -36,6 +37,7 @@ func Test_PolynomMultiply(t *testing.T) {
 	}
 }
 
+/*
 func Test_faCoefficents(t *testing.T) {
 	//Источник - http://kontromat.ru/?page_id=4955
 	x := []int{0, 1, 2, 3}
@@ -61,6 +63,30 @@ func Test_faCoefficents(t *testing.T) {
 		t.Errorf("Fa(3,0)")
 	}
 
+}
+*/
+func Test_PolynomialCoefficents(t *testing.T) {
+	/*
+		x := []int{0, 1, 2, 3}
+		fx := []int{-2, -5, 0, -4}
+
+		Excepted := []float64{-2, -12.66, 12.49, 2.83}
+
+		Result := make([]float64, len(x))
+
+		PolynomialCoefficents(&Result, x, fx)
+		//fmt.Println(Result)
+		if reflect.DeepEqual(Result, Excepted) {
+			t.Errorf("Incorrect")
+		}
+	*/
+	x := []int{2, 5, 8, 10, 15}
+	fx := []int{6, 3, 6, 3, 4}
+
+	Result := make([]float64, len(x))
+
+	PolynomialCoefficents(&Result, x, fx)
+	fmt.Println(Result)
 }
 
 func Test_fxPolynom(t *testing.T) {
