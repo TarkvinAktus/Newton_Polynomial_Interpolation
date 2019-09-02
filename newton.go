@@ -29,7 +29,6 @@ func Fa(i int, divDepth int, x []int, fx []int) float64 {
 		div = float64(x[i+divDepth] - x[divDepth])
 		if div != 0 {
 			result /= div
-			result = result
 		} else {
 			result = 0
 		}
