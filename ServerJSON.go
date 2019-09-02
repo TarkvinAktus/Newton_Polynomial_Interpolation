@@ -42,18 +42,17 @@ func startServer() {
 		w.Header().Set("Content-Type", "application/json")
 		var res Resp
 
+		if reqlen > 1 {
+			res.Pol = make([]float64, reqlen)
+			PolynomialCoefficents(&res.Pol, Xint, Yint)
+		}
 		/*
 			if reqlen > 1 {
-				res.Pol = make([]float64, reqlen)
-				PolynomialCoefficents(&res.Pol, Xint, Yint)
-			}
-		*/
-		if reqlen > 1 {
-			res.Pol = make([]float64, 600)
-			for i := 0; i < 600; i++ {
-				res.Pol[i] = float64(Lagrange(Xint, Yint, i))
-			}
-		}
+				res.Pol = make([]float64, 600)
+				for i := 0; i < 600; i++ {
+					res.Pol[i] = float64(Lagrange(Xint, Yint, i))
+				}
+			}*/
 		resJSON, err := json.Marshal(res)
 		if err != nil {
 			fmt.Printf("Error: %s", err)

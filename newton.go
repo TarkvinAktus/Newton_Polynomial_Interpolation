@@ -29,7 +29,7 @@ func Fa(i int, divDepth int, x []int, fx []int) float64 {
 		div = float64(x[i+divDepth] - x[divDepth])
 		if div != 0 {
 			result /= div
-			result = toFixed(result, 2)
+			result = result
 		} else {
 			result = 0
 		}
@@ -113,7 +113,7 @@ func PolynomialCoefficents(Result *[]float64, x []int, y []int) {
 		fmt.Println("PolBuf - ", PolBuf)
 		for i := 0; i < polLen; i++ {
 			//if coefficient ==0 => stop?
-			(*Result)[i] += toFixed((float64(PolBuf[i]))*AnCoefficient, 2)
+			(*Result)[i] += float64(PolBuf[i]) * AnCoefficient
 		}
 		//fmt.Println("Result ", i, " = ", (*Result))
 	}
