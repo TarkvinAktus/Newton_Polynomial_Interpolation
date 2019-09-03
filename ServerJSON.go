@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,9 +16,35 @@ type Resp struct {
 	Pol []float64 `json:"pol"`
 }
 
+type Page struct {
+	Title string
+	Body  []byte
+}
+
+func loadPage(title string) (*Page, error) {
+	filename := title + ".html"
+	body, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return &Page{Title: title, Body: body}, nil
+}
+
 func startServer() {
+	http.Handle("/static/",
+		http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("REQUEST -------- HOST - %s METHOD - %s Params - %s \n", r.Host, r.Method, r.URL.Query())
+		title := "index"
+		p, err := loadPage(title)
+		if err != nil {
+			p = &Page{Title: title}
+		}
+		fmt.Fprintf(w, string(p.Body))
+	})
+
+	http.HandleFunc("/Newton", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("REQUEST -------- Addr - %s HOST - %s NUM POINTS - %v \n", r.RemoteAddr, r.Host, len(r.URL.Query().Get("x")))
 
 		myX := r.URL.Query().Get("x")
 		myY := r.URL.Query().Get("y")
@@ -52,7 +79,7 @@ func startServer() {
 		if err != nil {
 			fmt.Printf("Error: %s", err)
 		}
-		fmt.Println("Result polynomial coefficents: ", res.Pol)
+		//fmt.Println("Result polynomial coefficents: ", res.Pol)
 
 		w.Write(resJSON)
 	})

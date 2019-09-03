@@ -1,0 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+   }
+#reload{
+    background-color: #b9e0fc;
+    color: black;
+    border-width: 0px;
+    display: table;
+    margin: 0 auto;
+}
+.nopadding{
+    padding: 0 !important;
+}
