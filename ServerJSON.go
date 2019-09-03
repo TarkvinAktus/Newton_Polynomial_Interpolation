@@ -3,16 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
-
-	//"io/ioutil"
-
-	"net/http"
-	//"net/url"
 )
 
-//Resp ОТВЕТНЫЕ ТОЧКИ
+//Resp for requeest and response
 type Resp struct {
 	X   []int     `json:"x"`
 	Y   []int     `json:"y"`
@@ -26,11 +22,13 @@ func startServer() {
 		myX := r.URL.Query().Get("x")
 		myY := r.URL.Query().Get("y")
 
+		//Split strings to slice of strings
 		Xstring := strings.Split(myX, ",")
 		Ystring := strings.Split(myY, ",")
 
 		reqlen := len(Xstring)
 
+		//Convert slice of strings to slice of ints
 		Xint := make([]int, reqlen)
 		Yint := make([]int, reqlen)
 		for i := 0; i < reqlen; i++ {
@@ -38,44 +36,33 @@ func startServer() {
 			Yint[i], _ = strconv.Atoi(Ystring[i])
 		}
 
+		//Set some headers
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Content-Type", "application/json")
+
 		var res Resp
 
+		//If its not single point data
 		if reqlen > 1 {
 			res.Pol = make([]float64, reqlen)
 			PolynomialCoefficents(&res.Pol, Xint, Yint)
 		}
-		/*
-			if reqlen > 1 {
-				res.Pol = make([]float64, 600)
-				for i := 0; i < 600; i++ {
-					res.Pol[i] = float64(Lagrange(Xint, Yint, i))
-				}
-			}*/
+
 		resJSON, err := json.Marshal(res)
 		if err != nil {
 			fmt.Printf("Error: %s", err)
 		}
+		fmt.Println("Result polynomial coefficents: ", res.Pol)
 
 		w.Write(resJSON)
 	})
-	/*
-		http.HandleFunc("/raw_body", func(w http.ResponseWriter, r *http.Request) {
-			body, err := ioutil.ReadAll(r.Body)
-			defer r.Body.Close() // важный пункт!
-			if err != nil {
-				http.Error(w, err.Error(), 500)
-				return
-			}
-			fmt.Fprintf(w, "postHandler: raw body %s\n", string(body))
-		})
-	*/
+
 	fmt.Println("starting server at :9000")
 	http.ListenAndServe(":9000", nil)
 }
 
 /*
+Template to deeper work with http reqests
 func runGetFullReq() {
 
 	req := &http.Request{
@@ -100,6 +87,7 @@ func runGetFullReq() {
 	fmt.Printf("testGetFullReq resp %#v\n\n\n", string(respBody))
 }*/
 
+//VERY HARD FUNC
 func main() {
 	startServer()
 }

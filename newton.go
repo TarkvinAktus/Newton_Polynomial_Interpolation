@@ -2,7 +2,6 @@ package main
 
 //Посроение интерполяционного многочлена Ньютона
 import (
-	"fmt"
 	"math"
 )
 
@@ -95,10 +94,11 @@ func PolynomialCoefficents(Result *[]float64, x []int, y []int) {
 		PolBuf := make([]int, polLen)
 
 		AnCoefficient = Fa(i, 0, x, y)
-		fmt.Println("Fa^", i, " - ", AnCoefficient)
+		//fmt.Println("Fa^", i, " - ", AnCoefficient)
 
 		//Pol member = Fn(x-n1)(x-n2)...(x-n-1)
 		for j := 0; j < i; j++ {
+			//(x-n1)
 			SecondMul := make([]int, 2)
 			SecondMul[0] = -x[j]
 			SecondMul[1] = 1
@@ -109,33 +109,8 @@ func PolynomialCoefficents(Result *[]float64, x []int, y []int) {
 				Multiply(&PolBuf, PolBuf, SecondMul, len(PolBuf), len(SecondMul))
 			}
 		}
-		fmt.Println("PolBuf - ", PolBuf)
 		for i := 0; i < polLen; i++ {
-			//if coefficient ==0 => stop?
 			(*Result)[i] += float64(PolBuf[i]) * AnCoefficient
 		}
-		//fmt.Println("Result ", i, " = ", (*Result))
 	}
-}
-
-//Lagrange ??
-func Lagrange(x []int, y []int, Xpoint int) int {
-	Sum := 0
-	PartSum := 0
-
-	for i := 0; i < len(x); i++ {
-		PartSum = y[i]
-		for n := 0; n < len(x); n++ {
-			if x[n] != Xpoint {
-				PartSum *= (Xpoint - x[n])
-			}
-		}
-		for m := 0; m < len(x); m++ {
-			if i != m {
-				PartSum /= (x[i] - x[m])
-			}
-		}
-		Sum += PartSum
-	}
-	return Sum
 }

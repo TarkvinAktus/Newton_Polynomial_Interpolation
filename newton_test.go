@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"math"
+	"reflect"
 	"testing"
 )
 
@@ -27,7 +27,6 @@ func Test_PolynomMultiply(t *testing.T) {
 		result := make([]int, n+m-1)
 
 		Multiply(&result, a[i], b[i], m, n)
-		//fmt.Println("result = ", result)
 
 		for j := 0; j < len(result); j++ {
 			if result[j] != answ[i][j] {
@@ -37,56 +36,64 @@ func Test_PolynomMultiply(t *testing.T) {
 	}
 }
 
-/*
 func Test_faCoefficents(t *testing.T) {
 	//Источник - http://kontromat.ru/?page_id=4955
 	x := []int{0, 1, 2, 3}
 	fx := []int{-2, -5, 0, -4}
 	FaExcepted := []float64{-3, 5, -4, 4, -4.5, -2.83}
 
-	if Fa(1, 0, x, fx) != FaExcepted[0] {
+	//Round to 2 signs because of giant floats
+	if toFixed(Fa(1, 0, x, fx), 2) != FaExcepted[0] {
 		t.Errorf("Fa(1,0)")
 	}
-	if Fa(1, 1, x, fx) != FaExcepted[1] {
+	if toFixed(Fa(1, 1, x, fx), 2) != FaExcepted[1] {
 		t.Errorf("Fa(1,1)")
 	}
-	if Fa(1, 2, x, fx) != FaExcepted[2] {
+	if toFixed(Fa(1, 2, x, fx), 2) != FaExcepted[2] {
 		t.Errorf("Fa(1,2)")
 	}
-	if Fa(2, 0, x, fx) != FaExcepted[3] {
+	if toFixed(Fa(2, 0, x, fx), 2) != FaExcepted[3] {
 		t.Errorf("Fa(2,0)")
 	}
-	if Fa(2, 1, x, fx) != FaExcepted[4] {
+	if toFixed(Fa(2, 1, x, fx), 2) != FaExcepted[4] {
 		t.Errorf("Fa(2,1)")
 	}
-	if Fa(3, 0, x, fx) != FaExcepted[5] {
+	if toFixed(Fa(3, 0, x, fx), 2) != FaExcepted[5] {
 		t.Errorf("Fa(3,0)")
 	}
-
 }
-*/
+
 func Test_PolynomialCoefficents(t *testing.T) {
-	/*
-		x := []int{0, 1, 2, 3}
-		fx := []int{-2, -5, 0, -4}
 
-		Excepted := []float64{-2, -12.66, 12.49, 2.83}
+	x := []int{0, 1, 2, 3}
+	fx := []int{-2, -5, 0, -4}
 
-		Result := make([]float64, len(x))
-
-		PolynomialCoefficents(&Result, x, fx)
-		//fmt.Println(Result)
-		if reflect.DeepEqual(Result, Excepted) {
-			t.Errorf("Incorrect")
-		}
-	*/
-	x := []int{2, 5, 8, 10, 15}
-	fx := []int{6, 3, 6, 3, 4}
+	Excepted := []float64{-2, -12.66, 12.49, 2.83}
 
 	Result := make([]float64, len(x))
 
 	PolynomialCoefficents(&Result, x, fx)
-	fmt.Println(Result)
+	//fmt.Println(Result)
+	//not have to use toFixed float round
+	if reflect.DeepEqual(Result, Excepted) {
+		t.Errorf("Incorrect")
+	}
+
+	/*Here was testing polinom to compare its fn coefficients
+	not about result coefficents
+
+	x1 := []int{2, 5, 8, 10, 15}
+	fx2 := []int{6, 3, 6, 3, 4}
+
+	Result2 := make([]float64, len(x1))
+
+	PolynomialCoefficents(&Result2, x1, fx2)
+
+	if reflect.DeepEqual(Result, Excepted?) {
+		t.Errorf("Incorrect")
+	}
+	fmt.Println(Result2)
+	*/
 }
 
 func Test_fxPolynom(t *testing.T) {
@@ -102,7 +109,7 @@ func Test_fxPolynom(t *testing.T) {
 		answ[i] = Polynom(x, fx, Xpoints[i])
 		//fmt.Print(" | Polynom ", i, " = ", answ[i])
 	}
-	//fmt.Println("")
+
 	for i := 0; i < 5; i++ {
 		//Вычисление тестового примера для
 		//x := []int{0, 1, 2, 3}
